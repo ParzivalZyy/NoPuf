@@ -5,7 +5,6 @@ from datetime import date, timedelta
 import threading
 import keyboard
 
-'не вставляй код c нейронки, который сам не можешь написать'
 class NoPafApp:
     def __init__(self, root):
         self.root = root
@@ -88,33 +87,6 @@ class NoPafApp:
     def safe_update_ui(self):
         self.root.after(0, self.update_counter_color)
 
-    def hex_to_rgb(self, hex_color):
-        hex_color = hex_color.lstrip("#")
-        return tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
-
-    def rgb_to_hex(self, rgb):
-        return "#{:02x}{:02x}{:02x}".format(*rgb)
-
-    def transition_color(self, start, end, steps, step):
-        return tuple(
-            int(start[i] + (end[i] - start[i]) * step / steps) for i in range(3)
-        )
-
-    def animate_color_transition(self, from_color, to_color, steps=10, delay=30):
-        from_rgb = self.hex_to_rgb(from_color)
-        to_rgb = self.hex_to_rgb(to_color)
-
-        def step_animation(step=0):
-            if step > steps:
-                self.current_bg = to_color
-                return
-            rgb = self.transition_color(from_rgb, to_rgb, steps, step)
-            hex_color = self.rgb_to_hex(rgb)
-            self.counter_label.config(bg=hex_color)
-            self.root.after(delay, step_animation, step + 1)
-
-        step_animation()
-
     def update_counter_color(self):
         today = date.today().isoformat()
         yesterday = (date.today() - timedelta(days=1)).isoformat()
@@ -122,22 +94,15 @@ class NoPafApp:
         yesterday_count = self.get_tyagi(yesterday)
 
         if yesterday_count == 0:
-            percent_change = 0
+            new_color = "#CCCCCC"  
+        elif today_count < yesterday_count * 0.9:
+            new_color = "#66ff66" 
+        elif today_count < yesterday_count:
+            new_color = "#ffff66"
         else:
-            percent_change = ((today_count - yesterday_count) / yesterday_count) * 100
+            new_color = "#ff6666"
 
-        self.counter_label.config(text=str(today_count))
-
-        if yesterday_count == 0:
-            new_color = "#CCCCCC"
-        elif percent_change <= -10:
-            new_color = "#00cc66"  
-        elif percent_change >= -5:
-            new_color = "#ff6666"  
-        else:
-            new_color = "#ffff66"  
-
-        self.animate_color_transition(self.current_bg, new_color)
+        self.counter_label.config(text=str(today_count), bg=new_color)
 
     def Back(self):
         self.clear_window()
