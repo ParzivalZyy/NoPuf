@@ -54,7 +54,7 @@ class NoPafApp:
         self.clear_window()
 
         self.counter_label = tk.Label(self.root, text="", font=("Arial", 40))
-        self.counter_label.place(x=0, y=30, width=400, height=80)
+        self.counter_label.place(x=0, y=0, width=400, height=125)
 
         self.update_counter_color()
 
