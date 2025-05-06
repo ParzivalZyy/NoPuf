@@ -6,7 +6,7 @@ import threading
 import keyboard
 
 class NoPafApp:
-    def __init__(self, root):
+    def __init__(self, root):       
         self.root = root
         self.root.title("NoPaf")
         self.root.geometry("400x300")
