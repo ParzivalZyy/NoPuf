@@ -110,31 +110,30 @@ class NoPafApp:
 
     def show_stats(self):
         self.check_new_day()
-        self.clear_window()
+        self.clear_window()  
+    
         tk.Button(self.root, text="Назад", command=self.Back, font=self.fontX, bg="white", fg="#000000").place(x=0, y=0, width=80, height=65)
-        tk.Label(self.root, text="Статистика", font=self.fontX, bg="#FFFFFF", fg="black").pack(pady=10)
-
-        frame = tk.Frame(self.root)
-        frame.pack(pady=10, fill=tk.BOTH, expand=True)
-
-        scrollbar = ttk.Scrollbar(frame)
+        tk.Label(self.root, text="Статистика", font=self.fontX, bg="#FFFFFF", fg="black").place(x=140, y=0, width=140, height=65)
+    
+        stats_frame = tk.Frame(self.root, bg="#FFFFFF")
+        stats_frame.place(x=0, y=65, width=400, height=235)
+    
+        scrollbar = ttk.Scrollbar(stats_frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-        tree = ttk.Treeview(frame, columns=("Дата", "Тяги"), show="headings", yscrollcommand=scrollbar.set)
+    
+        tree = ttk.Treeview(stats_frame, columns=("Дата", "Тяги"), show="headings", yscrollcommand=scrollbar.set)
         tree.heading("Дата", text="Дата")
         tree.heading("Тяги", text="Тяги")
-        tree.column("Дата", anchor="center")
-        tree.column("Тяги", anchor="center")
+        tree.column("Дата", anchor="center", width=150)
+        tree.column("Тяги", anchor="center", width=100)
         tree.pack(fill=tk.BOTH, expand=True)
-
+    
         scrollbar.config(command=tree.yview)
-
+    
         cursor = self.conn.cursor()
         cursor.execute("SELECT Дата, Тяги FROM Дата ORDER BY Дата DESC")
         for row in cursor.fetchall():
             tree.insert("", "end", values=(row[0], row[1]))
-
-        tk.Button(self.root, text="Назад", command=self.show_main_screen, font=self.fontX, bg="white", fg="#000000").pack(pady=20)
 
     def bind_pause_key(self):
         def listen():
