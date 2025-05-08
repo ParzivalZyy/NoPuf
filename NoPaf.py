@@ -82,9 +82,6 @@ class NoPafApp:
         cursor.execute("UPDATE Дата SET Тяги = Тяги + 1 WHERE Дата = ?", (today,))
         conn.commit()
         conn.close()
-        self.safe_update_ui()
-
-    def safe_update_ui(self):
         self.root.after(0, self.update_counter_color)
 
     def update_counter_color(self):
