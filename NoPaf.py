@@ -4,9 +4,7 @@ import sqlite3
 from datetime import date, timedelta
 import threading
 import keyboard
-## from tkinter.messagebox import showerror, showwarning, showinfo
-## from win10toast import ToastNotifier
-## import warnings
+from tkinter import messagebox 
 
 class NoPafApp(tk.Tk):
     def __init__(self):   
@@ -23,7 +21,7 @@ class NoPafApp(tk.Tk):
         self.update_today_data()
         self.bind_pause_key()
         self.show_main_screen()
-
+        
     def create_tables(self):
         cursor = self.conn.cursor()
         cursor.execute('''
@@ -33,12 +31,20 @@ class NoPafApp(tk.Tk):
                 Тяги INTEGER DEFAULT 0
             )
         ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS NoPaf (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Data2 DATE UNIQUE,
+                НетТягам INTEGER DEFAULT 0
+            )
+        ''')
         self.conn.commit()
 
     def update_today_data(self):
         today = date.today().isoformat()
         cursor = self.conn.cursor()
         cursor.execute("INSERT OR IGNORE INTO Дата (Дата, Тяги) VALUES (?, 0)", (today,))
+        cursor.execute("INSERT OR IGNORE INTO NoPaf (Data2, НетТягам) VALUES (?, 0)", (today,))
         self.conn.commit()
 
     def check_new_day(self):
@@ -56,36 +62,42 @@ class NoPafApp(tk.Tk):
         self.clear_window()
 
         self.counter_label = tk.Label(self, text="", font=("Arial", 40))
-        self.counter_label.place(x=0, y=0, width=400, height=123)
+        self.counter_label.place(x=0, y=0, width=400, height=127)
 
         self.update_counter_color()
-
-        tk.Button(self, text="+1 Тяга", command=self.increment_tyage, font=self.fontX, bg="white", fg="#000000").place(x=-2, y=125, width=407, height=90)
-        tk.Button(self, text="Статистика", command=self.show_stats, font=self.fontX, bg="white", fg="#000000").place(x=-2, y=215, width=407, height=85)
+        tk.Button(self, text="NoPaf", command=self.NoPafl, font=self.fontX, bg="white", fg="#000000").place(x=0, y=125, width=100, height=175)
+        tk.Button(self, text="+1 Тяга", command=self.add_tyage, font=self.fontX, bg="white", fg="#000000").place(x=100, y=125, width=300, height=90)
+        tk.Button(self, text="Статистика", command=self.show_stats, font=self.fontX, bg="white", fg="#000000").place(x=100, y=215, width=300, height=85)
 
     def get_tyagi(self, target_date):
         cursor = self.conn.cursor()
         cursor.execute("SELECT Тяги FROM Дата WHERE Дата = ?", (target_date,))
         result = cursor.fetchone()
         return result[0] if result else 0
-
-    def increment_tyage(self):
-        self.check_new_day()
+    
+    def add_tyage(self, threadsafe=False):
         today = date.today().isoformat()
-        cursor = self.conn.cursor()
-        cursor.execute("UPDATE Дата SET Тяги = Тяги + 1 WHERE Дата = ?", (today,))
-        self.conn.commit()
-        self.update_counter_color()
 
-    def increment_tyage_threadsafe(self):
-        today = date.today().isoformat()
-        conn = sqlite3.connect("NoPaf.db")
-        cursor = conn.cursor()
-        cursor.execute("INSERT OR IGNORE INTO Дата (Дата, Тяги) VALUES (?, 0)", (today,))
-        cursor.execute("UPDATE Дата SET Тяги = Тяги + 1 WHERE Дата = ?", (today,))
-        conn.commit()
-        conn.close()
-        self.after(0, self.update_counter_color)
+        def update_db(cursor):
+            cursor.execute("INSERT OR IGNORE INTO Дата (Дата, Тяги) VALUES (?, 0)", (today,))
+            cursor.execute("UPDATE Дата SET Тяги = Тяги + 1 WHERE Дата = ?", (today,))
+
+        if threadsafe:
+            def threaded_update():
+                conn = sqlite3.connect("NoPaf.db")
+                cursor = conn.cursor()
+                update_db(cursor)
+                conn.commit()
+                conn.close()
+                self.after(0, self.update_counter_color)
+
+            threading.Thread(target=threaded_update, daemon=True).start()
+        else:
+            self.check_new_day()
+            cursor = self.conn.cursor()
+            update_db(cursor)
+            self.conn.commit()
+            self.update_counter_color()
 
     def update_counter_color(self):
         today = date.today().isoformat()
@@ -99,10 +111,11 @@ class NoPafApp(tk.Tk):
             new_color = "#66ff66" 
         elif today_count < yesterday_count:
             new_color = "#ffff66"
-          ##  warnings.warn("Стоять, хуила", category=None, stacklevel=1, source=None)
-          ## не работает  self.toaster.show_toast("Предупреждение", "Прекращай портить биосферу своей игрушкой", duration=5, threaded=True)
+            messagebox.showwarning("!!!!!!!!!!!!!!!!!!!!!!!!!", "СТОЯТЬ, ХУИЛА") 
         else:
             new_color = "#ff6666"
+            messagebox.showwarning("!!!!!!!!!!!!!!!!!!!!!!!!!", "Ты прекратишь заниматься этим дерьмом," \
+            " или это придётся делать выжившим членам твоей семьи") 
 
         self.counter_label.config(text=str(today_count), bg=new_color)
 
@@ -137,14 +150,36 @@ class NoPafApp(tk.Tk):
         for row in cursor.fetchall():
             tree.insert("", "end", values=(row[0], row[1]))
 
+    def DayNoPaf(self):
+        self.check_new_day()
+        today = date.today().isoformat()
+        conn = sqlite3.connect("NoPaf.db")
+        cursor = conn.cursor()
+        cursor = self.conn.cursor()
+        cursor.execute("INSERT OR IGNORE INTO NoPaf (Data2, НетТягам) VALUES (?, 0)", (today,))
+        cursor.execute("UPDATE NoPaf SET НетТягам = НетТягам + 1 WHERE Data2 = ?", (today,))
+        self.conn.commit()
+
+
+
+    def infoTrueNoPaf(self):
+        messagebox.showinfo("True NoPaf", "В этом режиме можно считать колличество дней без затяжек") 
+
+    def NoPafl(self):
+        self.clear_window()
+        tk.Button(self, text="Назад", command=self.Back, font=self.fontX, bg="white", fg="#000000").place(x=0, y=125, width=100, height=175)
+        self.counter_label = tk.Label(self, text="", font=("Arial", 40))
+        self.counter_label.place(x=0, y=0, width=400, height=127)
+        tk.Button(self, text="+1 День без курения", command=self.DayNoPaf, font=self.fontX, bg="white", fg="#000000").place(x=100, y=125, width=300, height=175)
+        tk.Button(self, text="ЧаВо", command=self.infoTrueNoPaf, font=self.fontX, bg="white", fg="#000000").place(x=0, y=0, width=60, height=50)
+
     def bind_pause_key(self):
         def listen():
-            keyboard.add_hotkey("pause", self.increment_tyage_threadsafe)
+            keyboard.add_hotkey("pause", lambda: self.add_tyage(threadsafe=True))
             keyboard.wait()
 
         threading.Thread(target=listen, daemon=True).start()
 
-
 if __name__ == "__main__":
     app = NoPafApp()  
-    app.mainloop()  
+    app.mainloop()
