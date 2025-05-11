@@ -114,7 +114,8 @@ class NoPafApp(tk.Tk):
             messagebox.showwarning("!!!!!!!!!!!!!!!!!!!!!!!!!", "СТОЯТЬ, ХУИЛА") 
         else:
             new_color = "#ff6666"
-            messagebox.showwarning("!!!!!!!!!!!!!!!!!!!!!!!!!", "Ты прекратишь заниматься этим дерьмом," \
+            messagebox.showwarning("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+                                    "Ты прекратишь заниматься этим дерьмом," \
             " или это придётся делать выжившим членам твоей семьи") 
 
         self.counter_label.config(text=str(today_count), bg=new_color)
@@ -160,10 +161,8 @@ class NoPafApp(tk.Tk):
         cursor.execute("UPDATE NoPaf SET НетТягам = НетТягам + 1 WHERE Data2 = ?", (today,))
         self.conn.commit()
 
-
-
     def infoTrueNoPaf(self):
-        messagebox.showinfo("True NoPaf", "В этом режиме можно считать колличество дней без затяжек") 
+        messagebox.showinfo("True NoPaf", "В этом режиме приложения будут автоматически считаться дни без затяжек, если их не было, но надо зайти в приложение") 
 
     def NoPafl(self):
         self.clear_window()
