@@ -169,7 +169,7 @@ class NoPafApp(tk.Tk):
         tk.Button(self, text="Назад", command=self.Back, font=self.fontX, bg="white", fg="#000000").place(x=0, y=125, width=100, height=175)
         self.counter_label = tk.Label(self, text="", font=("Arial", 40))
         self.counter_label.place(x=0, y=0, width=400, height=127)
-        tk.Button(self, text="+1 День без курения", command=self.DayNoPaf, font=self.fontX, bg="white", fg="#000000").place(x=100, y=125, width=300, height=175)
+        tk.Button(self, text="Удалить", command=self.DayNoPaf, font=self.fontX, bg="white", fg="#000000").place(x=100, y=125, width=300, height=175)
         tk.Button(self, text="ЧаВо", command=self.infoTrueNoPaf, font=self.fontX, bg="white", fg="#000000").place(x=0, y=0, width=60, height=50)
 
     def bind_pause_key(self):
