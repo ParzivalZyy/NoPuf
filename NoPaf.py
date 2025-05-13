@@ -59,7 +59,7 @@ class NoPafApp(tk.Tk):
         self.counter_label.place(x=0, y=0, width=400, height=127)
 
         self.update_counter_color()
-        tk.Button(self, text="NoPaf", command=self.TrueNoPaf, font=self.fontX, bg="#ddd2fc", fg="#000000").place(x=0, y=125, width=100, height=175)
+        tk.Button(self, text="True\nNoPaf", command=self.TrueNoPaf, font=self.fontX, bg="#ddd2fc", fg="#000000").place(x=0, y=125, width=100, height=175)
         tk.Button(self, text="+1 Тяга", command=self.add_tyage, font=self.fontX, bg="#ddd2fc", fg="#000000").place(x=100, y=125, width=300, height=90)
         tk.Button(self, text="Статистика", command=self.show_stats, font=self.fontX, bg="#ddd2fc", fg="#000000").place(x=100, y=215, width=300, height=85)
 
