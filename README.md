@@ -1,5 +1,6 @@
 Приложение для отслеживание затяжек(сигарет), для постепенного бросания курить
-![изображение](https://github.com/user-attachments/assets/b45ad726-1a83-4bfb-8d35-7c223e54012d) ![изображение](https://github.com/user-attachments/assets/535100df-fd45-4f90-8efb-1f071c6cddb8)
+![изображение](https://github.com/user-attachments/assets/6da78159-ca35-4df1-96cf-07c4ae4a549f) ![изображение](https://github.com/user-attachments/assets/87dd399f-8f33-442a-8330-23a6896e6776)
+
 
 
 
