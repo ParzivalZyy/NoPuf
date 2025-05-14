@@ -1,5 +1,8 @@
 Приложение для отслеживание затяжек(сигарет), для постепенного бросания курить
-![изображение](https://github.com/user-attachments/assets/2f0bae25-02c6-47b2-bd92-731169ea5947) ![изображение](https://github.com/user-attachments/assets/6b4e5412-b296-4e59-a1ae-5e4777c98ed3)
+![изображение](https://github.com/user-attachments/assets/6da78159-ca35-4df1-96cf-07c4ae4a549f) ![изображение](https://github.com/user-attachments/assets/87dd399f-8f33-442a-8330-23a6896e6776)
+
+
+
 
 На главном экране сравнивается сегодняшний результат со вчерашним и Label меняет свой цвет по принципу:
 
