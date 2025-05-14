@@ -1,10 +1,13 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox 
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+
 import sqlite3
 from datetime import date, timedelta
 import threading
 import keyboard
-from tkinter import messagebox 
+
 
 class NoPafApp(tk.Tk):
     def __init__(self):   
@@ -17,12 +20,19 @@ class NoPafApp(tk.Tk):
         self.last_checked_date = date.today().isoformat()
         self.current_bg = "#FFFFFF"
 
+        self.CounterDayWithNotyag = 0
+
+        self.configure_styles()
         self.create_tables()
         self.update_today_data()
         self.bind_pause_key()
         self.show_main_screen()
 
-        self.CounterDayWithNotyag = 0
+    def configure_styles(self):
+        style = ttk.Style()
+        style.configure("Success.TButton", font=("Arial", 18), background="#28a745", anchor="center")  # Зеленая кнопка
+        style.configure("Info.TButton", font=("Arial", 18), background="#17a2b8", anchor="center")    # Синяя кнопка
+        style.configure("Warning.TButton", font=("Arial", 18), background="#ffc107", anchor="center") # Желтая кнопка
 
     def create_tables(self):
         cursor = self.conn.cursor()
@@ -51,17 +61,21 @@ class NoPafApp(tk.Tk):
         for widget in self.winfo_children():
             widget.destroy()
 
+    def create_button(self, text, command, style, x, y, width, height):
+        ttk.Button(self, text=text, command=command, style=style).place(x=x, y=y, width=width, height=height)
+
     def show_main_screen(self):
         self.check_new_day()
         self.clear_window()
 
         self.counter_label = tk.Label(self, text="", font=("Arial", 40))
-        self.counter_label.place(x=0, y=0, width=400, height=127)
+        self.counter_label.place(x=0, y=0, width=400, height=170)
 
         self.update_counter_color()
-        tk.Button(self, text="True\nNoPaf", command=self.TrueNoPaf, font=self.fontX, bg="#ddd2fc", fg="#000000").place(x=0, y=125, width=100, height=175)
-        tk.Button(self, text="+1 Тяга", command=self.add_tyagi, font=self.fontX, bg="#ddd2fc", fg="#000000").place(x=100, y=125, width=300, height=90)
-        tk.Button(self, text="Статистика", command=self.show_stats, font=self.fontX, bg="#ddd2fc", fg="#000000").place(x=100, y=215, width=300, height=85)
+
+        self.create_button(" True\nNoPaf", self.TrueNoPaf, "Success.TButton", 0, 170, 100, 130)
+        self.create_button("+1 Тяга", self.add_tyagi, "Info.TButton", 100, 170, 300, 65)
+        self.create_button("Статистика", self.show_stats, "Warning.TButton", 100, 235, 300, 65)
 
     def get_tyagi(self, target_date):
         cursor = self.conn.cursor()
@@ -70,10 +84,9 @@ class NoPafApp(tk.Tk):
         return result[0] if result else 0
     
     def add_tyagi(self, threadsafe=False):
-        self.increment_tyage(threadsafe)
-
-    def increment_tyage(self, threadsafe=False):
         today = date.today().isoformat()
+        yesterday = (date.today() - timedelta(days=1)).isoformat()
+        yesterday_count = self.get_tyagi(yesterday)
 
         def update_db():
             conn = sqlite3.connect("NoPaf.db") if threadsafe else self.conn
@@ -96,6 +109,13 @@ class NoPafApp(tk.Tk):
             self.conn.commit()
             self.update_counter_color()
 
+        today_count = self.get_tyagi(today)
+        if yesterday_count > 0:
+            if today_count >= yesterday_count:
+                messagebox.showwarning("Ууу какой баран сидит", "Ты уже достиг вчерашнего рекорда, отдыхай")
+            elif today_count >= yesterday_count * 0.9:
+                messagebox.showwarning("Предупреждение", "Приближаешься к вчерашнему рекорду, стоит прекратить")
+
     def update_counter_color(self):
         today = date.today().isoformat()
         yesterday = (date.today() - timedelta(days=1)).isoformat()
@@ -108,11 +128,8 @@ class NoPafApp(tk.Tk):
             new_color = "#66ff66" 
         elif today_count < yesterday_count:
             new_color = "#ffff66"
-            messagebox.showwarning("Предупреждение", "Приближаешься к вчерашнему рекорду, стоит прекратить") 
         else:
             new_color = "#ff6666"
-            messagebox.showwarning("Ууу какой баран сидит",
-                                    "Ты уже достиг вчерашнего рекорда, отдыхай") 
 
         self.counter_label.config(text=str(today_count), bg=new_color)
 
@@ -123,9 +140,8 @@ class NoPafApp(tk.Tk):
     def show_stats(self):
         self.check_new_day()
         self.clear_window()  
-    
-        tk.Button(self, text="Назад", command=self.Back, font=self.fontX, bg="#ddd2fc", fg="#000000").place(x=10, y=10, width=80, height=45)
-        tk.Label(self, text="Статистика", font=self.fontX, bg="#FFFFFF", fg="black").place(x=130, y=0, width=140, height=65)
+        self.create_button("Назад", self.Back, "Warning.TButton", 10, 10, 80, 45)
+        tk.Label(self, text="Статистика", font=self.fontX, bg="#FFFFFF", fg="#004D40").place(x=130, y=0, width=140, height=65)
     
         stats_frame = tk.Frame(self, bg="#FFFFFF")
         stats_frame.place(x=0, y=65, width=400, height=235)
@@ -153,12 +169,18 @@ class NoPafApp(tk.Tk):
 
     def TrueNoPaf(self):
         self.clear_window()
-        tk.Button(self, text="Назад", command=self.Back, font=self.fontX, bg="#ddd2fc", fg="#000000").place(x=0, y=200, width=400, height=100)
+        
         self.counter_ClearDaylabel = tk.Label(self, text="", font=("Arial", 40))
-        self.counter_ClearDaylabel.place(x=0, y=0, width=400, height=200)
-        tk.Button(self, text="ЧаВо", command=self.infoTrueNoPaf, font=self.fontX, bg="#ddd2fc", fg="#000000").place(x=0, y=0, width=60, height=50)
-       
-        today = date.today().isoformat()
+        self.counter_ClearDaylabel.place(x=0, y=0, width=400, height=230)
+
+        style = ttk.Style()
+        style.configure("Info.TButton", font=("Arial", 16), background="#17a2b8", anchor="center")
+        style.configure("Warning.TButton", font=("Arial", 18), background="#ffc107", anchor="center") # Желтая кнопка
+
+        ttk.Button(self, text="Назад", command=self.Back, bootstyle=WARNING, style="Warning.TButton").place(x=80, y=230, width=320, height=70)
+        ttk.Button(self, text="ЧаВо?", command=self.infoTrueNoPaf, bootstyle=INFO, style="Info.TButton").place(x=0, y=230, width=80, height=70)         
+     
+     # TODO:автоматический подсчёт дней, когда программа не открыта
 
         yesterday = (date.today() - timedelta(days=1)).isoformat()
         yesterday_count = self.get_tyagi(yesterday)
