@@ -30,7 +30,7 @@ class NoPafApp(tk.Tk):
 
     def configure_styles(self):
         style = ttk.Style()
-        style.configure("Success.TButton", font=("Arial", 18), background="#28a745", anchor="center")  # Зеленая кнопка
+        style.configure("Success.TButton", font=("Arial", 18), background="#9c78c3", anchor="center")  # Зеленая кнопка
         style.configure("Info.TButton", font=("Arial", 18), background="#17a2b8", anchor="center")    # Синяя кнопка
         style.configure("Warning.TButton", font=("Arial", 18), background="#ffc107", anchor="center") # Желтая кнопка
 
@@ -78,9 +78,11 @@ class NoPafApp(tk.Tk):
         self.create_button("Статистика", self.show_stats, "Warning.TButton", 100, 235, 300, 65)
 
     def get_tyagi(self, target_date):
-        cursor = self.conn.cursor()
+        conn = sqlite3.connect("NoPaf.db") 
+        cursor = conn.cursor()
         cursor.execute("SELECT Тяги FROM Stats WHERE Дата = ?", (target_date,))
         result = cursor.fetchone()
+        conn.close()  
         return result[0] if result else 0
     
     def add_tyagi(self, threadsafe=False):
@@ -89,13 +91,12 @@ class NoPafApp(tk.Tk):
         yesterday_count = self.get_tyagi(yesterday)
 
         def update_db():
-            conn = sqlite3.connect("NoPaf.db") if threadsafe else self.conn
+            conn = sqlite3.connect("NoPaf.db")
             cursor = conn.cursor()
             cursor.execute("INSERT OR IGNORE INTO Stats (Дата, Тяги) VALUES (?, 0)", (today,))
             cursor.execute("UPDATE Stats SET Тяги = Тяги + 1 WHERE Дата = ?", (today,))
-            if threadsafe:
-                conn.commit()
-                conn.close()
+            conn.commit()
+            conn.close()
 
         if threadsafe:
             def threaded_update():
@@ -106,7 +107,6 @@ class NoPafApp(tk.Tk):
         else:
             self.check_new_day()
             update_db()
-            self.conn.commit()
             self.update_counter_color()
 
         today_count = self.get_tyagi(today)
@@ -175,7 +175,7 @@ class NoPafApp(tk.Tk):
 
         style = ttk.Style()
         style.configure("Info.TButton", font=("Arial", 16), background="#17a2b8", anchor="center")
-        style.configure("Warning.TButton", font=("Arial", 18), background="#ffc107", anchor="center") # Желтая кнопка
+        style.configure("Warning.TButton", font=("Arial", 18), background="#ffc107", anchor="center")
 
         ttk.Button(self, text="Назад", command=self.Back, bootstyle=WARNING, style="Warning.TButton").place(x=80, y=230, width=320, height=70)
         ttk.Button(self, text="ЧаВо?", command=self.infoTrueNoPaf, bootstyle=INFO, style="Info.TButton").place(x=0, y=230, width=80, height=70)         
