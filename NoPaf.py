@@ -9,10 +9,10 @@ import keyboard
 
 class NoPafApp(ttk.Window):  
     def __init__(self):
-        super().__init__() 
+        super().__init__(themename="superhero")  
         self.title("NoPaf")
         self.geometry("340x480")
-        self.configure(bg="#22223c")
+        self.configure(bg="#2b3e4f")
         self.conn = sqlite3.connect("NoPaf.db")
         self.fontX = ("Segoe UI", 18)
         self.last_checked_date = date.today().isoformat()
@@ -26,15 +26,35 @@ class NoPafApp(ttk.Window):
 
     def configure_styles(self):
         style = ttk.Style()
-        style.configure("TrueNoPaf.TButton", font=("Segoe UI", 15, "bold"), borderwidth=0, relief="flat",
-                        foreground="#f2e9e4", background="#4a4e69", anchor="center", padding=10)
-        style.configure("Plus_Info.TButton", font=("Segoe UI", 18), borderwidth=0, relief="flat",
-                        foreground="#22223b", background="#9a8c98", anchor="center", padding=10)
-        style.configure("Stats_back.TButton", font=("Segoe UI", 18), borderwidth=0, relief="flat",
-                        foreground="#22223b", background="#f2e9e4", anchor="center", padding=10)
-        style.map("TButton",
-                  foreground=[('active', '#f2e9e4')],
-                  background=[('active', '#9a8c98')])
+        # Пастельный фиолетовый для основной кнопки
+        style.configure(
+            "TrueNoPaf.TButton",
+            font=("Segoe UI", 14, "bold"),
+            background="#b39ddb",      # пастельный фиолетовый
+            foreground="#22223b",
+            borderwidth=0,
+            focusthickness=3,
+            focuscolor="#a18cd1"
+        )
+        style.configure(
+            "Plus_Info.TButton",
+            font=("Segoe UI", 18, "bold"),
+            background="#a18cd1",      # ещё один пастельный фиолетовый
+            foreground="#22223b",
+            borderwidth=0
+        )
+        style.configure(
+            "Stats_back.TButton",
+            font=("Segoe UI", 18, "bold"),
+            background="#ede7f6",      # светлый пастельный
+            foreground="#22223b",
+            borderwidth=0
+        )
+        # Для эффекта наведения
+        style.map(
+            "TButton",
+            background=[("active", "#9575cd")],  # чуть ярче при наведении
+        )
 
     def create_tables(self):
         cursor = self.conn.cursor()
@@ -70,10 +90,10 @@ class NoPafApp(ttk.Window):
         self.check_new_day()
         self.clear_window()
 
-        self.counter_canvas = tk.Canvas(self, width=220, height=220, highlightthickness=0, bg="#22223c", bd=0)
+        self.counter_canvas = tk.Canvas(self, width=220, height=220, highlightthickness=0, bg="#22223c", bd=0, highlightbackground="#22223c")
         self.counter_canvas.place(x=60, y=100)
 
-        self.circle = self.counter_canvas.create_oval(10, 10, 210, 210, fill="#4a4e69", outline="#9a8c98", width=4)
+        self.circle = self.counter_canvas.create_oval(10, 10, 210, 210, fill="#4a4e69", outline="#22223c", width=4)
         self.counter_text = self.counter_canvas.create_text(110, 110, text="", font=("Segoe UI", 48, "bold"), fill="#2F2C2C")
 
         self.update_counter_color()
