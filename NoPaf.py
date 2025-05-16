@@ -1,25 +1,21 @@
 import tkinter as tk
-from tkinter import ttk, messagebox 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-
+from tkinter import messagebox
 import sqlite3
 from datetime import date, timedelta
 import threading
 import keyboard
 
-
-class NoPafApp(tk.Tk):
-    def __init__(self):   
-        super().__init__()  
+class NoPafApp(ttk.Window):  
+    def __init__(self):
+        super().__init__() 
         self.title("NoPaf")
-        self.geometry("400x300")
-        self.configure(bg="#FFFFFF")
+        self.geometry("340x480")
+        self.configure(bg="#22223c")
         self.conn = sqlite3.connect("NoPaf.db")
-        self.fontX = ("Arial", 16)
+        self.fontX = ("Segoe UI", 18)
         self.last_checked_date = date.today().isoformat()
-        self.current_bg = "#FFFFFF"
-
         self.CounterDayWithNotyag = 0
 
         self.configure_styles()
@@ -30,9 +26,15 @@ class NoPafApp(tk.Tk):
 
     def configure_styles(self):
         style = ttk.Style()
-        style.configure("Success.TButton", font=("Arial", 18), background="#9c78c3", anchor="center")  # Зеленая кнопка
-        style.configure("Info.TButton", font=("Arial", 18), background="#17a2b8", anchor="center")    # Синяя кнопка
-        style.configure("Warning.TButton", font=("Arial", 18), background="#ffc107", anchor="center") # Желтая кнопка
+        style.configure("TrueNoPaf.TButton", font=("Segoe UI", 15, "bold"), borderwidth=0, relief="flat",
+                        foreground="#f2e9e4", background="#4a4e69", anchor="center", padding=10)
+        style.configure("Plus_Info.TButton", font=("Segoe UI", 18), borderwidth=0, relief="flat",
+                        foreground="#22223b", background="#9a8c98", anchor="center", padding=10)
+        style.configure("Stats_back.TButton", font=("Segoe UI", 18), borderwidth=0, relief="flat",
+                        foreground="#22223b", background="#f2e9e4", anchor="center", padding=10)
+        style.map("TButton",
+                  foreground=[('active', '#f2e9e4')],
+                  background=[('active', '#9a8c98')])
 
     def create_tables(self):
         cursor = self.conn.cursor()
@@ -68,14 +70,17 @@ class NoPafApp(tk.Tk):
         self.check_new_day()
         self.clear_window()
 
-        self.counter_label = tk.Label(self, text="", font=("Arial", 40))
-        self.counter_label.place(x=0, y=0, width=400, height=170)
+        self.counter_canvas = tk.Canvas(self, width=220, height=220, highlightthickness=0, bg="#22223c", bd=0)
+        self.counter_canvas.place(x=60, y=100)
+
+        self.circle = self.counter_canvas.create_oval(10, 10, 210, 210, fill="#4a4e69", outline="#9a8c98", width=4)
+        self.counter_text = self.counter_canvas.create_text(110, 110, text="", font=("Segoe UI", 48, "bold"), fill="#2F2C2C")
 
         self.update_counter_color()
 
-        self.create_button(" True\nNoPaf", self.TrueNoPaf, "Success.TButton", 0, 170, 100, 130)
-        self.create_button("+1 Тяга", self.add_tyagi, "Info.TButton", 100, 170, 300, 65)
-        self.create_button("Статистика", self.show_stats, "Warning.TButton", 100, 235, 300, 65)
+        self.create_button("True NoPaf", self.TrueNoPaf, "TrueNoPaf.TButton", 20, 10, 155, 60)
+        self.create_button("+1 Тяга", self.add_tyagi, "Plus_Info.TButton", 110, 350, 120, 60)
+        self.create_button("Stats", self.show_stats, "Stats_back.TButton", 200, 10, 120, 60)
 
     def get_tyagi(self, target_date):
         conn = sqlite3.connect("NoPaf.db") 
@@ -84,7 +89,7 @@ class NoPafApp(tk.Tk):
         result = cursor.fetchone()
         conn.close()  
         return result[0] if result else 0
-    
+
     def add_tyagi(self, threadsafe=False):
         today = date.today().isoformat()
         yesterday = (date.today() - timedelta(days=1)).isoformat()
@@ -102,7 +107,6 @@ class NoPafApp(tk.Tk):
             def threaded_update():
                 update_db()
                 self.after(0, self.update_counter_color)
-
             threading.Thread(target=threaded_update, daemon=True).start()
         else:
             self.check_new_day()
@@ -123,15 +127,19 @@ class NoPafApp(tk.Tk):
         yesterday_count = self.get_tyagi(yesterday)
 
         if yesterday_count == 0:
-            new_color = "#CCCCCC"  
+            new_color = "#b5b6bb"  
         elif today_count < yesterday_count * 0.9:
             new_color = "#66ff66" 
         elif today_count < yesterday_count:
-            new_color = "#ffff66"
+            new_color = "#ffff66"  
         else:
             new_color = "#ff6666"
 
-        self.counter_label.config(text=str(today_count), bg=new_color)
+        self.update_counter_canvas(today_count, new_color)
+
+    def update_counter_canvas(self, value, color):
+        self.counter_canvas.itemconfig(self.circle, fill=color)
+        self.counter_canvas.itemconfig(self.counter_text, text=str(value))
 
     def Back(self):
         self.clear_window()
@@ -140,16 +148,15 @@ class NoPafApp(tk.Tk):
     def show_stats(self):
         self.check_new_day()
         self.clear_window()  
-        self.create_button("Назад", self.Back, "Warning.TButton", 10, 10, 80, 45)
-        tk.Label(self, text="Статистика", font=self.fontX, bg="#FFFFFF", fg="#004D40").place(x=130, y=0, width=140, height=65)
+        tk.Label(self, text="Статистика", font=("Segoe UI", 22, "bold"), bg="#22223b", fg="#f2e9e4").place(x=0, y=0, width=340, height=60)
     
-        stats_frame = tk.Frame(self, bg="#FFFFFF")
-        stats_frame.place(x=0, y=65, width=400, height=235)
+        stats_frame = tk.Frame(self, bg="#22223b")
+        stats_frame.place(x=20, y=70, width=300, height=300)
     
         scrollbar = ttk.Scrollbar(stats_frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     
-        tree = ttk.Treeview(stats_frame, columns=("Дата", "Тяги"), show="headings", yscrollcommand=scrollbar.set)
+        tree = ttk.Treeview(stats_frame, columns=("Дата", "Тяги"), show="headings", yscrollcommand=scrollbar.set, style="Treeview")
         tree.heading("Дата", text="Дата")
         tree.heading("Тяги", text="Тяги")
         tree.column("Дата", anchor="center", width=150)
@@ -163,25 +170,19 @@ class NoPafApp(tk.Tk):
         for row in cursor.fetchall():
             tree.insert("", "end", values=(row[0], row[1]))
 
+        self.create_button("Назад", self.Back, "Stats_back.TButton", 90, 400, 160, 65)
 
     def infoTrueNoPaf(self):
         messagebox.showinfo("True NoPaf", "В этом режиме приложения будут автоматически считаться дни без затяжек подряд") 
 
     def TrueNoPaf(self):
         self.clear_window()
-        
-        self.counter_ClearDaylabel = tk.Label(self, text="", font=("Arial", 40))
-        self.counter_ClearDaylabel.place(x=0, y=0, width=400, height=230)
+        self.counter_ClearDaylabel = tk.Label(self, text="", font=("Segoe UI", 44, "bold"), bg="#4a4e69", fg="#f2e9e4")
+        self.counter_ClearDaylabel.place(x=20, y=40, width=300, height=120)
 
-        style = ttk.Style()
-        style.configure("Info.TButton", font=("Arial", 16), background="#17a2b8", anchor="center")
-        style.configure("Warning.TButton", font=("Arial", 18), background="#ffc107", anchor="center")
-
-        ttk.Button(self, text="Назад", command=self.Back, bootstyle=WARNING, style="Warning.TButton").place(x=80, y=230, width=320, height=70)
-        ttk.Button(self, text="ЧаВо?", command=self.infoTrueNoPaf, bootstyle=INFO, style="Info.TButton").place(x=0, y=230, width=80, height=70)         
+        ttk.Button(self, text="Назад", command=self.Back, style="Stats_back.TButton").place(x=180, y=200, width=120, height=60)
+        ttk.Button(self, text="ЧаВо?", command=self.infoTrueNoPaf, style="Plus_Info.TButton").place(x=40, y=200, width=120, height=60)         
      
-     # TODO:автоматический подсчёт дней, когда программа не открыта
-
         yesterday = (date.today() - timedelta(days=1)).isoformat()
         yesterday_count = self.get_tyagi(yesterday)
         if yesterday_count == 0: 
@@ -195,9 +196,8 @@ class NoPafApp(tk.Tk):
         def listen():
             keyboard.add_hotkey("pause", lambda: self.add_tyagi(threadsafe=True))
             keyboard.wait()
-
         threading.Thread(target=listen, daemon=True).start()
 
 if __name__ == "__main__":
-    app = NoPafApp()  
+    app = NoPafApp()
     app.mainloop()
