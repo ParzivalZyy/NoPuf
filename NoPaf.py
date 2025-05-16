@@ -15,7 +15,6 @@ class NoPafApp(ttk.Window):
         self.geometry("340x480")
         self.configure(bg="#2b3e4f")
         self.conn = sqlite3.connect("NoPaf.db")
-        self.fontX = ("Segoe UI", 18)
         self.last_checked_date = date.today().isoformat()
         self.CounterDayWithNotyag = 0
 
@@ -68,9 +67,6 @@ class NoPafApp(ttk.Window):
         for widget in self.winfo_children():
             widget.destroy()
 
-    def create_button(self, text, command, style, x, y, width, height):
-        ttk.Button(self, text=text, command=command, style=style).place(x=x, y=y, width=width, height=height)
-
     def show_main_screen(self):
         self.check_new_day()
         self.clear_window()
@@ -91,12 +87,11 @@ class NoPafApp(ttk.Window):
         tk.Button(self, image=self.img_plus, command=self.add_tyagi, borderwidth=0, bg="#2b3e4f", activebackground="#2b3e4f").place(x=110, y=360, width=120, height=60)
 
     def get_tyagi(self, target_date):
-        conn = sqlite3.connect("NoPaf.db") 
-        cursor = conn.cursor()
-        cursor.execute("SELECT Тяги FROM Stats WHERE Дата = ?", (target_date,))
-        result = cursor.fetchone()
-        conn.close()  
-        return result[0] if result else 0
+        with sqlite3.connect("NoPaf.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT Тяги FROM Stats WHERE Дата = ?", (target_date,))
+            result = cursor.fetchone()
+            return result[0] if result else 0
 
     def add_tyagi(self, threadsafe=False):
         today = date.today().isoformat()
@@ -163,10 +158,6 @@ class NoPafApp(ttk.Window):
         self.circle_label.image = circle_img
         self.counter_text_label.config(text=str(today_count), bg=counter_bg, fg="#2F2C2C")
         self.interval_label.config(text=interval_text)
-
-    def update_counter_canvas(self, value, color):
-        self.circle_label.config(image=self.circle_white if color == "#b5b6bb" else self.circle_green if color == "#66ff66" else self.circle_yellow if color == "#ffff66" else self.circle_red)
-        self.counter_text_label.config(text=str(value), bg=color)
 
     def Back(self):
         self.clear_window()
