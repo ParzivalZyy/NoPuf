@@ -3,7 +3,7 @@
 К слову, приложение не может бросить курить за вас, он лишь помогает избавитьтся от вредной привычки
 
     Главное меню:
-![alt text](MainMenuForREADME.png)
+![изображение](https://github.com/user-attachments/assets/2f45c048-4083-483c-87ae-07e1e245892a)
 
 
 
@@ -16,12 +16,14 @@
 Кнопки True NoPaf И Stats (Статистика) открывают соответсвующие окна
 
     Меню True NoPaf:
-![alt text](<True NoPafForREADME.png>)
+![изображение](https://github.com/user-attachments/assets/b0b39620-761a-4748-bc6d-27a9dcf971b5)
+
 
 Смысл в том, что программа сама считает, слолько дней вы не курили 
 
     Меню Статистика:
-![alt text](StatsForREADME.png)
+![изображение](https://github.com/user-attachments/assets/eb693f83-9a50-45f7-9f70-1744973b5bea)
+
 
  Данное окно отображает сколько было выкуренно за конекретный день в виде таблицы
 
