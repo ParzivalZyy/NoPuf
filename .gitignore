@@ -1,2 +1,6 @@
 NoPaf.db
 .vscode/settings.json
+UI.py
+logic.py
+__pycache__/logic.cpython-313.pyc
+__pycache__/UI.cpython-313.pyc

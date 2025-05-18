@@ -81,7 +81,6 @@ class NoPafApp(ttk.Window):
         for widget in self.winfo_children():
             widget.destroy()
 
-
     def show_main_screen(self):
         self.check_new_day()
         self.clear_window()
@@ -109,7 +108,7 @@ class NoPafApp(ttk.Window):
 
         tk.Button(self, image=self.img_true_nopaf, command=self.TrueNoPaf, borderwidth=0, bg=self.BG_COLOR, activebackground=self.BG_COLOR).place(x=20, y=10, width=105, height=70)
         tk.Button(self, image=self.img_stats, command=self.show_stats, borderwidth=0, bg=self.BG_COLOR, activebackground=self.BG_COLOR).place(x=210, y=10, width=105, height=70)  
-        tk.Button(self, image=self.img_plus, command=self.add_tyagi, borderwidth=0, bg=self.BG_COLOR, activebackground=self.BG_COLOR).place(x=110, y=380, width=120, height=60)
+        tk.Button(self, image=self.img_plus, command=self.add_tyagi, borderwidth=0, bg=self.BG_COLOR, activebackground=self.BG_COLOR).place(x=110, y=360, width=120, height=60)
 
     def get_tyagi(self, target_date):
         with sqlite3.connect("NoPaf.db") as conn:
